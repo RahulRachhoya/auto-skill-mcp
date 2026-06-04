@@ -105,18 +105,9 @@ def _term_width() -> int:
 
 def _center(text: str) -> str:
     w = _term_width()
-    stripped = text
-    for c in vars(Color).values():
-        if isinstance(c, str) and c.startswith("\033"):
-            stripped = stripped.replace(c, "")
-    stripped = stripped.replace(Color.RESET, "")
+    stripped = _strip_ansi(text)
     pad = max(0, (w - len(stripped)) // 2)
     return " " * pad + text
-
-
-def _box_line(left: str, mid: str, right: str, fill: str = "═") -> str:
-    w = _term_width() - 4
-    return Color.DIM + left + fill * w + right + Color.RESET
 
 
 def logo() -> None:
@@ -332,10 +323,6 @@ def uninstall_summary(count: int) -> None:
     )
     print(Color.MAGENTA + "  ╚══════════════════════════════════════╝" + Color.RESET)
     print()
-
-
-def print_noop(*args: object, **kwargs: object) -> None:
-    pass
 
 
 _init_ansi()

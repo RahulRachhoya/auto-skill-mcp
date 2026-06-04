@@ -12,6 +12,10 @@ from typing import cast
 
 from auto_skill_mcp.installer.detector import Agent
 
+OK = "ok"
+SKIP = "skip"
+WOULD = "would"
+
 SERVER_ENTRY: dict[str, object] = {
     "command": "uvx",
     "args": ["auto-skill-mcp"],
@@ -31,16 +35,19 @@ def _backup(path: Path) -> Path | None:
     if not path.exists():
         return None
     ts = datetime.now().strftime("%Y%m%d-%H%M%S")
-    bak = path.with_suffix(path.suffix + f".bak.{ts}")
+    bak = Path(f"{path}.bak.{ts}")
     shutil.copy2(path, bak)
     return bak
 
 
 def _read_json(path: Path) -> dict[str, object]:
-    """Read a JSON config file, returning empty dict if not found."""
+    """Read a JSON config file, returning empty dict if not found or malformed."""
     if not path.exists():
         return {}
-    return cast(dict[str, object], json.loads(path.read_text(encoding="utf-8")))
+    try:
+        return cast(dict[str, object], json.loads(path.read_text(encoding="utf-8")))
+    except json.JSONDecodeError:
+        return {}
 
 
 def _write_json_atomic(path: Path, data: dict[str, object]) -> None:
@@ -75,20 +82,32 @@ def _merge_via_mcp_servers(
     return config
 
 
+def _opencode_servers(config: dict[str, object]) -> dict[str, object]:
+    """Return the mcp dict with auto-skill-mcp filtered out of servers."""
+    mcp_raw = config.get("mcp", {})
+    mcp: dict[str, object] = cast(dict[str, object], mcp_raw) if isinstance(mcp_raw, dict) else {}
+    existing = mcp.get("servers", [])
+    if isinstance(existing, list):
+        filtered = [
+            s for s in existing if not (isinstance(s, dict) and s.get("name") == "auto-skill-mcp")
+        ]
+        mcp["servers"] = filtered
+    else:
+        mcp["servers"] = []
+    return mcp
+
+
 def _merge_via_opencode(
     config: dict[str, object],
     entry: dict[str, object],
 ) -> dict[str, object]:
     """Merge entry into OpenCode's array-based format."""
-    mcp_raw = config.get("mcp", {})
-    mcp: dict[str, object] = cast(dict[str, object], mcp_raw) if isinstance(mcp_raw, dict) else {}
-    servers_list: list[dict[str, object]] = []
-    existing = mcp.get("servers", [])
-    if isinstance(existing, list):
-        servers_list = [
-            s for s in existing if not (isinstance(s, dict) and s.get("name") == "auto-skill-mcp")
-        ]
-    servers_list.append(
+    mcp = _opencode_servers(config)
+    existing_servers = mcp.get("servers", [])
+    servers: list[dict[str, object]] = (
+        list(existing_servers) if isinstance(existing_servers, list) else []
+    )
+    servers.append(
         {
             "name": "auto-skill-mcp",
             "transport": "stdio",
@@ -97,27 +116,27 @@ def _merge_via_opencode(
             "enabled": True,
         }
     )
-    mcp["servers"] = servers_list
+    mcp["servers"] = servers
     config["mcp"] = mcp
     return config
 
 
-def configure_agent(agent: Agent, dry_run: bool = False) -> str:
+def configure_agent(agent: Agent, dry_run: bool = False) -> tuple[str, str]:
     """Add auto-skill-mcp to a single agent's config file.
 
-    Returns a status message.
+    Returns (status, message). Status is one of OK, SKIP, WOULD.
     """
     path = agent.config_path
     if path is None:
-        return "no path"
+        return SKIP, "no path"
 
     if not path.parent.exists():
-        return "parent dir missing"
+        return SKIP, "parent dir missing"
 
     entry = _entry_for(agent)
 
     if dry_run:
-        return "would configure"
+        return WOULD, "would configure"
 
     bak = _backup(path)
     config = _read_json(path)
@@ -128,35 +147,27 @@ def configure_agent(agent: Agent, dry_run: bool = False) -> str:
         config = _merge_via_mcp_servers(config, agent.root_key, entry)
 
     _write_json_atomic(path, config)
-    return "configured" + (f" (backup: {bak.name})" if bak else "")
+    detail = f" (backup: {bak.name})" if bak else ""
+    return OK, "configured" + detail
 
 
-def uninstall_agent(agent: Agent, dry_run: bool = False) -> str:
-    """Remove auto-skill-mcp from a single agent's config file."""
+def uninstall_agent(agent: Agent, dry_run: bool = False) -> tuple[str, str]:
+    """Remove auto-skill-mcp from a single agent's config file.
+
+    Returns (status, message). Status is one of OK, SKIP, WOULD.
+    """
     path = agent.config_path
     if path is None or not path.exists():
-        return "not found"
+        return SKIP, "not found"
 
     if dry_run:
-        return "would remove"
+        return WOULD, "would remove"
 
     bak = _backup(path)
     config = _read_json(path)
 
     if agent.name == "opencode":
-        mcp_raw = config.get("mcp", {})
-        mcp: dict[str, object] = (
-            cast(dict[str, object], mcp_raw) if isinstance(mcp_raw, dict) else {}
-        )
-        servers_list: list[dict[str, object]] = []
-        existing = mcp.get("servers", [])
-        if isinstance(existing, list):
-            servers_list = [
-                s
-                for s in existing
-                if not (isinstance(s, dict) and s.get("name") == "auto-skill-mcp")
-            ]
-        mcp["servers"] = servers_list
+        mcp = _opencode_servers(config)
         config["mcp"] = mcp
     else:
         root = config.get(agent.root_key, {})
@@ -164,4 +175,5 @@ def uninstall_agent(agent: Agent, dry_run: bool = False) -> str:
             root.pop("auto-skill-mcp", None)
 
     _write_json_atomic(path, config)
-    return "removed" + (f" (backup: {bak.name})" if bak else "")
+    detail = f" (backup: {bak.name})" if bak else ""
+    return OK, "removed" + detail

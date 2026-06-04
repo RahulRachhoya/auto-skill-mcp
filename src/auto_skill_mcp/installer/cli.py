@@ -5,7 +5,7 @@ from __future__ import annotations
 import sys
 
 from auto_skill_mcp.installer import console
-from auto_skill_mcp.installer.configurator import configure_agent, uninstall_agent
+from auto_skill_mcp.installer.configurator import OK, WOULD, configure_agent, uninstall_agent
 from auto_skill_mcp.installer.detector import detect_global, detect_project
 
 
@@ -36,11 +36,11 @@ def _run_install(dry_run: bool = False) -> None:
         if not agent.config_path.parent.exists() and not agent.detected:
             console.result_row(agent.display, "skip", "agent not installed")
             continue
-        msg = configure_agent(agent, dry_run=dry_run)
-        if dry_run:
+        status, msg = configure_agent(agent, dry_run=dry_run)
+        if status == WOULD:
             console.result_row(agent.display, "ok", "would configure")
             g_ok += 1
-        elif "configured" in msg:
+        elif status == OK:
             console.result_row(agent.display, "ok", msg)
             g_ok += 1
         else:
@@ -52,8 +52,8 @@ def _run_install(dry_run: bool = False) -> None:
         if not agent.config_path:
             console.project_row(str(agent.paths.get("all", "")), False)
             continue
-        msg = configure_agent(agent, dry_run=dry_run)
-        ok = dry_run or "configured" in msg
+        status, msg = configure_agent(agent, dry_run=dry_run)
+        ok = status in (OK, WOULD)
         if ok:
             p_ok += 1
         console.project_row(str(agent.config_path), ok)
@@ -71,8 +71,8 @@ def _run_uninstall() -> None:
     for agent in global_agents:
         if not agent.config_path or not agent.config_path.exists():
             continue
-        msg = uninstall_agent(agent)
-        if "removed" in msg:
+        status, msg = uninstall_agent(agent)
+        if status == OK:
             console.result_row(agent.display, "ok", msg)
             count += 1
         else:
@@ -81,8 +81,8 @@ def _run_uninstall() -> None:
     for agent in project_agents:
         if not agent.config_path or not agent.config_path.exists():
             continue
-        msg = uninstall_agent(agent)
-        if "removed" in msg:
+        status, msg = uninstall_agent(agent)
+        if status == OK:
             console.result_row(agent.display, "ok", msg)
             count += 1
         else:
