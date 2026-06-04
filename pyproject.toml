@@ -34,7 +34,7 @@ dev = [
 ]
 
 [project.scripts]
-auto-skill-mcp = "auto_skill_mcp.server:main"
+auto-skill-mcp = "auto_skill_mcp.installer.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/RahulRachhoya/auto-skill-mcp"
