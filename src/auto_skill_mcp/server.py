@@ -10,7 +10,7 @@ from auto_skill_mcp.tools.search_skills import make_search_skills
 
 mcp = FastMCP("auto-skill-mcp")
 
-_skill_dir = Path(__file__).resolve().parent.parent.parent / "skill_data"
+_skill_dir = Path(__file__).resolve().parent / "skill_data"
 _registry = SkillRegistry(skill_dir=_skill_dir)
 
 

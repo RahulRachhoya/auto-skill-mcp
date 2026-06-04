@@ -5,7 +5,7 @@ from auto_skill_mcp.skills.registry import SkillRegistry
 
 
 def test_registry_loads_skills():
-    skill_dir = Path(__file__).resolve().parent.parent / "skill_data"
+    skill_dir = Path(__file__).resolve().parent.parent / "src" / "auto_skill_mcp" / "skill_data"
     registry = SkillRegistry(skill_dir=skill_dir)
     assert registry.count() > 0
     skill = registry.get("code-review")
@@ -15,7 +15,7 @@ def test_registry_loads_skills():
 
 
 def test_matcher_returns_results():
-    skill_dir = Path(__file__).resolve().parent.parent / "skill_data"
+    skill_dir = Path(__file__).resolve().parent.parent / "src" / "auto_skill_mcp" / "skill_data"
     registry = SkillRegistry(skill_dir=skill_dir)
     matcher = SkillMatcher(registry)
     results = matcher.find_relevant("review code quality", top_k=3)

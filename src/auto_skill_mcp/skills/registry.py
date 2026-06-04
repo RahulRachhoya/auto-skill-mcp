@@ -4,7 +4,7 @@ import yaml
 
 from auto_skill_mcp.models import Skill
 
-SKILL_DATA_DIR = Path(__file__).resolve().parent.parent.parent.parent / "skill_data"
+SKILL_DATA_DIR = Path(__file__).resolve().parent.parent / "skill_data"
 
 
 class SkillRegistry:

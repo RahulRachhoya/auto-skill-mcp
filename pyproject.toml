@@ -4,11 +4,21 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "auto-skill-mcp"
-version = "0.1.0"
+version = "0.2.0"
 description = "One MCP server that auto-serves skills to agentic coding tools"
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
 requires-python = ">=3.12"
+authors = [
+    { name = "Rahul Rachhoya" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Build Tools",
+]
+keywords = ["mcp", "skills", "ai", "agent", "coding"]
 dependencies = [
     "fastmcp>=3.0",
     "scikit-learn>=1.5",
@@ -23,6 +33,9 @@ dev = [
     "mypy>=1.10",
 ]
 
+[project.scripts]
+auto-skill-mcp = "auto_skill_mcp.server:main"
+
 [project.urls]
 Homepage = "https://github.com/RahulRachhoya/auto-skill-mcp"
 
@@ -31,7 +44,7 @@ where = ["src"]
 include = ["auto_skill_mcp*"]
 
 [tool.setuptools.package-data]
-auto_skill_mcp = ["py.typed"]
+auto_skill_mcp = ["py.typed", "skill_data/**/*.md"]
 
 [tool.ruff]
 line-length = 100
