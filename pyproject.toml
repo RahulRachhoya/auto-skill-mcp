@@ -1,6 +1,6 @@
 [build-system]
 requires = ["setuptools>=75"]
-build-backend = "setuptools.backends._legacy:_Backend"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "auto-skill-mcp"
@@ -28,6 +28,10 @@ Homepage = "https://github.com/RahulRachhoya/auto-skill-mcp"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["auto_skill_mcp*"]
+
+[tool.setuptools.package-data]
+auto_skill_mcp = ["py.typed"]
 
 [tool.ruff]
 line-length = 100
