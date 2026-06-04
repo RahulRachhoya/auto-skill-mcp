@@ -1,7 +1,9 @@
+from collections.abc import Callable
+
 from auto_skill_mcp.skills.registry import SkillRegistry
 
 
-def make_get_skill(registry: SkillRegistry):
+def make_get_skill(registry: SkillRegistry) -> Callable[[str], str]:
     def get_skill(skill_name: str) -> str:
         """Load the full content of a specific skill by name.
 
