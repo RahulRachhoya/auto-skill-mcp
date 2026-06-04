@@ -1,4 +1,5 @@
-import numpy as np
+from typing import Any
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -10,7 +11,7 @@ class SkillMatcher:
     def __init__(self, registry: SkillRegistry) -> None:
         self.registry = registry
         self._vectorizer: TfidfVectorizer | None = None
-        self._tfidf_matrix: np.ndarray | None = None
+        self._tfidf_matrix: Any = None
         self._skill_names: list[str] = []
         self._build_index()
 

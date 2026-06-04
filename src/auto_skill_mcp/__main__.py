@@ -1,3 +1,3 @@
-from auto_skill_mcp.server import main
+from auto_skill_mcp.installer.cli import main
 
 main()

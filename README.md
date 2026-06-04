@@ -1,19 +1,49 @@
 # auto-skill-mcp
 
-One MCP server that auto-serves skills to agentic coding tools. Connect once, get expert guidance on any task.
+One MCP server that auto-serves skills to agentic coding tools. Connect once,
+get expert guidance on any task.
 
 ## Quick start
 
 ```bash
+# Install globally
 pip install auto-skill-mcp
 
-# or with uv
+# Or run directly with uv (no install needed)
 uvx auto-skill-mcp
 ```
 
-## Agent configuration
+## Auto-installer
 
-Add to your MCP config (e.g. `claude_desktop_config.json`, `.cursor/config.json`, or `.vscode/mcp.json`):
+Detect and configure your coding agents automatically:
+
+```bash
+# Scan for agents and preview changes
+auto-skill-mcp install --dry-run
+
+# Install to all detected agents
+auto-skill-mcp install
+
+# List detected agents and their config files
+auto-skill-mcp list
+
+# Remove from all agents
+auto-skill-mcp uninstall
+
+# Start the MCP server (default, same as `uvx auto-skill-mcp`)
+auto-skill-mcp
+```
+
+The installer detects these agents across global and project scope:
+- **Global:** Claude Desktop, Claude Code, Cursor, Windsurf, Cline, Roo Code,
+  OpenCode, Gemini CLI, GitHub Copilot CLI
+- **Project:** VS Code `.vscode/mcp.json`, JetBrains `.idea/mcp.json`,
+  Claude Code `.mcp.json`, Cursor `.cursor/mcp.json`
+
+## Manual configuration
+
+Add to your MCP config (`claude_desktop_config.json`, `.cursor/mcp.json`,
+`.vscode/mcp.json`, etc.):
 
 ```json
 {
@@ -28,9 +58,10 @@ Add to your MCP config (e.g. `claude_desktop_config.json`, `.cursor/config.json`
 
 ## How it works
 
-Your coding agent calls `analyze_task()` at the start of any task. The server classifies the task intent via TF-IDF matching, finds the most relevant skills from a bundled library (~43 curated guides), and returns a structured plan with recommendations.
-
-No manual skill installation. No `/skill-name` commands to remember. One connection.
+Your coding agent calls `analyze_task()` at the start of any task. The server
+classifies the task intent via TF-IDF matching, finds the most relevant skills
+from a bundled library (43 curated guides), and returns a structured plan with
+recommendations. No manual skill installation — one connection.
 
 ## Tools
 
@@ -52,7 +83,7 @@ No manual skill installation. No `/skill-name` commands to remember. One connect
 3. agent uses the guidance to perform the task
 ```
 
-## Skills included (~43)
+## Skills included (43)
 
 | Category | Skills |
 |---|---|
