@@ -1,8 +1,12 @@
+from collections.abc import Callable
+
 from auto_skill_mcp.skills.registry import SkillRegistry
 
 
-def make_list_skills(registry: SkillRegistry):
-    def list_skills(category: str | None = None) -> list[dict]:
+def make_list_skills(
+    registry: SkillRegistry,
+) -> Callable[[str | None], list[dict[str, str | list[str]]]]:
+    def list_skills(category: str | None = None) -> list[dict[str, str | list[str]]]:
         """Browse all available skills, optionally filtered by category.
 
         Args:

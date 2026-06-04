@@ -1,11 +1,15 @@
+from collections.abc import Callable
+
 from auto_skill_mcp.skills.matcher import SkillMatcher
 from auto_skill_mcp.skills.registry import SkillRegistry
 
 
-def make_search_skills(registry: SkillRegistry):
+def make_search_skills(
+    registry: SkillRegistry,
+) -> Callable[[str, int], list[dict[str, str | float]]]:
     matcher = SkillMatcher(registry)
 
-    def search_skills(query: str, top_k: int = 5) -> list[dict]:
+    def search_skills(query: str, top_k: int = 5) -> list[dict[str, str | float]]:
         """Search across all bundled skills using TF-IDF relevance matching.
 
         Args:

@@ -1,4 +1,5 @@
 import re
+from collections.abc import Callable
 
 from auto_skill_mcp.models import MatchedSkill, TaskAnalysis
 from auto_skill_mcp.skills.matcher import SkillMatcher
@@ -50,10 +51,10 @@ def estimate_complexity(task_context: str) -> str:
     return "low"
 
 
-def make_analyze_task(registry: SkillRegistry):
+def make_analyze_task(registry: SkillRegistry) -> Callable[[str, str], dict[str, object]]:
     matcher = SkillMatcher(registry)
 
-    def analyze_task(task_context: str, goal: str = "") -> dict:
+    def analyze_task(task_context: str, goal: str = "") -> dict[str, object]:
         """Essential first step for ANY task. Analyzes the task, classifies it, and returns
         relevant skill recommendations and a suggested approach. Call this BEFORE starting
         any implementation, debugging, review, or planning work.

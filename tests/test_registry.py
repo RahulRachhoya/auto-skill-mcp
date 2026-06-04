@@ -1,6 +1,7 @@
 from pathlib import Path
-from auto_skill_mcp.skills.registry import SkillRegistry
+
 from auto_skill_mcp.skills.matcher import SkillMatcher
+from auto_skill_mcp.skills.registry import SkillRegistry
 
 
 def test_registry_loads_skills():
