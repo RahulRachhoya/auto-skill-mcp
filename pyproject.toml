@@ -8,13 +8,14 @@ version = "0.0.1"
 description = "One MCP server that auto-serves skills to agentic coding tools"
 readme = "README.md"
 license = "MIT"
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 authors = [
     { name = "Rahul Rachhoya" },
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.13",
     "Topic :: Software Development :: Build Tools",
 ]
@@ -48,13 +49,13 @@ auto_skill_mcp = ["py.typed", "skill_data/**/*.md"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py312"
+target-version = "py310"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W"]
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.10"
 strict = true
 ignore_missing_imports = true
 
